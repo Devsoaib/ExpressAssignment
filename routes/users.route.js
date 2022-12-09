@@ -48,11 +48,28 @@ const storage = multer.diskStorage({
       cb(null, 'uploads/')
     },
     filename: function (req, file, cb) {
-      const name = Date.now() + "-" + file.originalname;
+      const name = file.originalname;
       cb(null, name)
     }
   });
-  const upload = multer({ storage: storage })
+  const upload = multer({
+    storage:storage,
+    limits: {
+       fileSize: 1000000 // 1000000 Bytes = 1 MB
+     },
+   fileFilter:(req, file, callBack) => {
+        // upload only png and jpg format
+       if(file.mimetype === 'image/jpg'||
+         file.mimetype === 'image/png'
+       ){
+           callBack(null, true);
+       }else{
+           callBack(new Error('Only png, jpg supported!'));
+           
+       }
+   }
+
+});
 
 router.get("/register", (req, res, next) => {
     res.sendFile(path.join(__dirname + "/../views/register.html"))
